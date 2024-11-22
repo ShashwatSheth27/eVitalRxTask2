@@ -93,7 +93,7 @@ if (!isset($_SESSION['user_id'])) {
             success: function(response) {
                 if (response.success === 1) {
                     const productSelect = $('#products_dropdown');
-                    response.data.forEach(product => {
+                    Object.values(response.data).forEach(product => {
                         const productOption = `<option value="${product.id}" data-price="${product.price}" data-name="${product.product_name}" ${!product.stock_quantity > 0 ? 'disabled' : ''}>${product.product_name} - ${product.price} INR (${product.stock_quantity} in stock)</option>`;
                         productSelect.append(productOption);
                     });

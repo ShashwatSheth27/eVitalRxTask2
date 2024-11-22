@@ -44,9 +44,9 @@
                 let productTable = $('#productTable tbody');
                 productTable.empty();
 
-                if (response.success === 1 && response.data.length > 0) {
+                if (response.success === 1) {
 
-                    response.data.forEach(function(product) {
+                    Object.values(response.data).forEach(function(product) {
                         let productRow = `
                                 <tr class="hover:bg-gray-100">
                                     <td class="py-3 px-6 text-gray-700">${product.id}</td>

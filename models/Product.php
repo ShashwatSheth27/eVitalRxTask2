@@ -12,16 +12,43 @@ class Product
 
     public function getAllProducts($params = array())
     {
-        $query = "SELECT p.id, p.product_name, p.description, p.price, p.stock_quantity, c.category_name FROM products p 
+        $query = "SELECT p.id, p.product_name, p.description, p.price, p.stock_quantity, c.category_name, pm.type as media_type, pm.path as media_path FROM products p 
                     left join categories c on c.id = p.category_id 
-                    -- left join product_media pm on pm.product_id = p.id 
+                    left join product_media pm on pm.product_id = p.id
                     WHERE p.is_deleted = false 
                     ORDER BY p.id DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $resData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (!empty($params) && !empty($params['countOnly'])) return count($resData);
-        return $resData;
+        $uniqueProducts = [];
+        foreach($resData as $product) {
+            $uniqueProductID = 's'.strval($product['id']); // appended 's' to retain the order
+            if(!isset($uniqueProducts[$uniqueProductID])){
+                $uniqueProducts[$uniqueProductID] = [
+                    'id' => $product['id'],
+                    'product_name' => $product['product_name'],
+                    'description' => $product['description'],
+                    'price' => $product['price'],
+                    'stock_quantity' => $product['stock_quantity'],
+                    'category_name' => $product['category_name']
+                ];
+                if(!empty($product['media_path']) && !empty($product['media_type'])){
+                    $uniqueProducts[$uniqueProductID]['media'] = [
+                        'type' => $product['media_type'],
+                        'path' => $product['media_path']
+                    ];
+                }
+            }
+            else {
+                $mediaArr = [
+                    'type' => $product['media_type'],
+                    'path' => $product['media_path']
+                ];
+                $uniqueProducts[$uniqueProductID]['media'][] = $mediaArr;
+            }
+        }
+        if (!empty($params) && !empty($params['countOnly'])) return count($uniqueProducts);
+        return $uniqueProducts;
     }
 
     public function getProductById($product_id)

@@ -95,7 +95,7 @@ if ($order_id == null) {
             success: function(response) {
                 if (response.success === 1) {
                     const productSelect = $('#products_dropdown');
-                    response.data.forEach(product => {
+                    Object.values(response.data).forEach(product => {
                         productSelect.append(`
                             <option value="${product.id}" data-price="${product.price}" data-name="${product.product_name}">
                                 ${product.product_name} - ${product.price} INR (${product.stock_quantity} in stock)
